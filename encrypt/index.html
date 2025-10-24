@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>pgp --encrypt</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #111111;
+      overflow: hidden;
+    }
+    
+    ::selection {
+      background: wheat;
+      color: #111111
+    }
+
+    ::-moz-selection {
+      background: wheat;
+      color: #111111
+    }
+
+    main {
+      max-width: 800px;
+      margin: 10px auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: scroll;
+    }
+
+    .info  {
+      font-family: monospace;
+      margin: 20px 10px;
+    }
+
+    .info h1 {
+      color: wheat;
+      letter-spacing: 3px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      margin: 0 10px;
+      border: none;
+      background-color: #1e1e1e;
+    }
+
+    textarea {
+      color: white;
+      letter-spacing: 2px;
+      font-size: 14px;
+      padding: 10px;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      flex: 1;
+      resize: none;
+    }
+  </style>
+  <script src="https://unpkg.com/openpgp@6.2.2/dist/openpgp.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const inputPubkeyElem = document.getElementById('input-pubkey');
+      const inputPubkeyInfoElem = document.getElementById('input-pubkey-info');
+      const inputMessageElem = document.getElementById('input-message');
+      const outputCipherElem = document.getElementById('output-cipher');
+  
+      const reconcile = async () => {
+        const armoredKey = inputPubkeyElem.value;
+        const text = inputMessageElem.value;
+
+        inputMessageElem.rows = text.split('\n').length > 5 ? text.split('\n').length : 5;
+
+        await Promise.all([
+          openpgp.readKey({ armoredKey }),
+          openpgp.createMessage({text}),
+        ])
+        .then(([encryptionKeys, message]) => {
+          inputPubkeyInfoElem.value = encryptionKeys.users.map(u => `UserID: ${u.userID.userID}`).join('\n');
+          inputPubkeyInfoElem.rows = encryptionKeys.users.length;
+          return openpgp.encrypt({message, encryptionKeys});
+        })
+        .then((cipher) => {
+          outputCipherElem.rows = text !== "" ? cipher.split('\n').length : 5;
+          outputCipherElem.value = text !== "" ? cipher : "";
+        })
+        .catch((e) => {
+          inputPubkeyInfoElem.value = "";
+          outputCipherElem.value = armoredKey !== "" ? `Error: ${e.message}` : "";
+        })
+      };
+
+      const focusSelect = (evt) => {
+        evt.target.focus();
+        evt.target.select();
+      }
+
+      const focusSelectCopy = (evt) => {
+        evt.target.focus();
+        evt.target.select();
+        navigator.clipboard.writeText(evt.target.value);
+      }
+
+      inputPubkeyElem.addEventListener('input', reconcile);
+      inputMessageElem.addEventListener('input', reconcile);
+      inputPubkeyElem.addEventListener('click', focusSelect)
+      outputCipherElem.addEventListener('click', focusSelectCopy)
+      reconcile();
+    });
+  </script>
+</head>
+<body>
+  <main>
+    <div class="info">
+      <h1>pgp --encrypt</h1>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="input-pubkey" rows="5" placeholder="pubkey"></textarea>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="input-pubkey-info" disabled="disabled" rows="1" placeholder="pubkey info"></textarea>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="input-message" rows="5" placeholder="message"></textarea>
+    </div>
+    <div class="input-wrapper">
+      <textarea readonly="readonly" id="output-cipher" rows="5" placeholder="cipher"></textarea>
+    </div>
+  </main>
+</body>
+</html>
