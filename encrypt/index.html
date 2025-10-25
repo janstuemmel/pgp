@@ -61,56 +61,7 @@
     }
   </style>
   <script src="https://unpkg.com/openpgp@6.2.2/dist/openpgp.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const inputPubkeyElem = document.getElementById('input-pubkey');
-      const inputPubkeyInfoElem = document.getElementById('input-pubkey-info');
-      const inputMessageElem = document.getElementById('input-message');
-      const outputCipherElem = document.getElementById('output-cipher');
-  
-      const reconcile = async () => {
-        const armoredKey = inputPubkeyElem.value;
-        const text = inputMessageElem.value;
-
-        inputMessageElem.rows = text.split('\n').length > 5 ? text.split('\n').length : 5;
-
-        await Promise.all([
-          openpgp.readKey({ armoredKey }),
-          openpgp.createMessage({text}),
-        ])
-        .then(([encryptionKeys, message]) => {
-          inputPubkeyInfoElem.value = encryptionKeys.users.map(u => `UserID: ${u.userID.userID}`).join('\n');
-          inputPubkeyInfoElem.rows = encryptionKeys.users.length;
-          return openpgp.encrypt({message, encryptionKeys});
-        })
-        .then((cipher) => {
-          outputCipherElem.rows = text !== "" ? cipher.split('\n').length : 5;
-          outputCipherElem.value = text !== "" ? cipher : "";
-        })
-        .catch((e) => {
-          inputPubkeyInfoElem.value = "";
-          outputCipherElem.value = armoredKey !== "" ? `Error: ${e.message}` : "";
-        })
-      };
-
-      const focusSelect = (evt) => {
-        evt.target.focus();
-        evt.target.select();
-      }
-
-      const focusSelectCopy = (evt) => {
-        evt.target.focus();
-        evt.target.select();
-        navigator.clipboard.writeText(evt.target.value);
-      }
-
-      inputPubkeyElem.addEventListener('input', reconcile);
-      inputMessageElem.addEventListener('input', reconcile);
-      inputPubkeyElem.addEventListener('click', focusSelect)
-      outputCipherElem.addEventListener('click', focusSelectCopy)
-      reconcile();
-    });
-  </script>
+  <script defer src="main.js"></script>
 </head>
 <body>
   <main>
