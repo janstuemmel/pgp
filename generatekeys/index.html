@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>pgp --generateKeys</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background-color: #111111;
+    }
+    
+    ::selection {
+      background: wheat;
+      color: #111111
+    }
+
+    ::-moz-selection {
+      background: wheat;
+      color: #111111
+    }
+
+    main {
+      max-width: 800px;
+      margin: 10px auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .info  {
+      font-family: monospace;
+      margin: 10px 10px;
+    }
+
+    .info h1 {
+      color: wheat;
+      margin: 0;
+      letter-spacing: 3px;
+    }
+
+    .input-wrapper {
+      display: flex;
+      margin: 0 10px;
+      border: none;
+      background-color: #1e1e1e;
+    }
+
+    textarea {
+      color: white;
+      letter-spacing: 2px;
+      font-size: 14px;
+      padding: 10px;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      flex: 1;
+      resize: none;
+    }
+  </style>
+  <script src="https://unpkg.com/openpgp@6.2.2/dist/openpgp.min.js"></script>
+  <script defer src="main.js"></script>
+</head>
+<body>
+  <main>
+    <div class="info">
+      <h1>pgp --generateKeys</h1>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="input-username" autocapitalize="off" spellcheck="false" autocomplete="off" rows="1" placeholder="username"></textarea>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="input-email" autocapitalize="off" spellcheck="false" autocomplete="off" rows="1" placeholder="email"></textarea>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="input-password" autocapitalize="off" spellcheck="false" autocomplete="off" rows="1" placeholder="password"></textarea>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="output-pubkey" readonly="readonly" spellcheck="false" autocomplete="off" id="output-pubkey" rows="5" placeholder="pubkey"></textarea>
+    </div>
+    <div class="input-wrapper">
+      <textarea id="output-privkey" readonly="readonly" spellcheck="false" autocomplete="off" id="output-privkey" rows="5" placeholder="privkey"></textarea>
+    </div>
+  </main>
+</body>
+</html>
